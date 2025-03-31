@@ -56,10 +56,9 @@ def create_zip(downloaded_files, zip_name='Anexos_ANS.zip'):
         return False
 
 def main():
-    # Configurações
+    # URL a ser acessada
     target_url = "https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos"
     
-    # Execução passo a passo
     print("1. Obtendo links dos PDFs...")
     pdf_links = get_pdf_links(target_url)
     
