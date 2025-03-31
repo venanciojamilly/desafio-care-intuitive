@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Operadoras de Saúde</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .search-box { margin-bottom: 20px; }
+        input { width: 70%; padding: 8px; }
+        button { padding: 8px 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .loading { color: #666; font-style: italic; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Busca de Operadoras de Saúde</h1>
+        
+        <div class="search-box">
+            <input v-model="searchQuery" @keyup.enter="search" placeholder="Digite o nome da operadora...">
+            <button @click="search">Buscar</button>
+            <span v-if="isLoading" class="loading">Carregando...</span>
+            <span v-if="error" class="error">{{ error }}</span>
+        </div>
+        
+        <div v-if="results.length > 0">
+            <h2>Resultados para "{{ lastQuery }}"</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Registro ANS</th>
+                        <th>CNPJ</th>
+                        <th>Razão Social</th>
+                        <th>Nome Fantasia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in results" :key="item['Registro ANS']">
+                        <td>{{ item['Registro ANS'] }}</td>
+                        <td>{{ item['CNPJ'] }}</td>
+                        <td>{{ item['Razão Social'] }}</td>
+                        <td>{{ item['Nome Fantasia'] }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue;
+        
+        createApp({
+            setup() {
+                const searchQuery = ref('');
+                const results = ref([]);
+                const isLoading = ref(false);
+                const error = ref('');
+                const lastQuery = ref('');
+                
+                const search = async () => {
+                    if (!searchQuery.value.trim()) {
+                        error.value = 'Por favor, digite um termo para busca';
+                        return;
+                    }
+                    
+                    isLoading.value = true;
+                    error.value = '';
+                    lastQuery.value = searchQuery.value;
+                    
+                    try {
+                        const response = await axios.get('http://localhost:5000/api/search', {
+                            params: { q: searchQuery.value }
+                        });
+                        results.value = response.data.results;
+                    } catch (err) {
+                        error.value = 'Erro ao buscar operadoras: ' + (err.response?.data?.error || err.message);
+                        results.value = [];
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+                
+                return { searchQuery, results, isLoading, error, lastQuery, search };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
