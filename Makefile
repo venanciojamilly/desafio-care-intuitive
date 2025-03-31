@@ -1,8 +1,10 @@
 VENV = venv
 PYTHON = $(VENV)/bin/python
 SCRIPTS = scripts/
+DB-TEST = db-test/
+SERVER = api/
 
-.PHONY: help install clean webscraping transformacao
+.PHONY: help install clean webscraping transformacao prep-bd run-flask
 
 help:
 	@echo "Comandos disponíveis:"
@@ -23,7 +25,16 @@ transformacao:
 	@echo "Executando transformação de dados..."
 	$(PYTHON) $(SCRIPTS)data-transformacao.py
 
+prep-bd:
+	@echo "Preparando dados"
+	$(PYTHON) $(DB-TEST)prep-task.py 
+
+run-flask:
+	@echo "Rodando Server flask"
+	$(PYTHON) $(SERVER)server.py
+
 clean:
 	rm -rf $(VENV)
+	rm -rf downloads
 	rm -f *.zip *.pdf *.csv *.xlsx
 	rm -rf __pycache__
