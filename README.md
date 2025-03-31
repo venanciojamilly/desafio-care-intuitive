@@ -1,68 +1,116 @@
-# README - Testes de Nivelamento v.250321
+# README - Sistema de Processamento de Dados ANS
 
-Este documento descreve uma série de testes de nivelamento divididos em quatro categorias principais: Web Scraping, Transformação de Dados, Banco de Dados e API. Cada teste possui requisitos específicos e deve ser realizado utilizando as tecnologias indicadas.
+## Visão Geral
 
----
+Este projeto contém um conjunto de scripts Python para coleta, processamento e análise de dados da Agência Nacional de Saúde Suplementar (ANS), com automação via Makefile.
 
-## **1. Teste de Web Scraping**
-**Objetivo:** Acessar um site, baixar arquivos PDF e compactá-los.  
-**Linguagens:** Python ou Java.  
+## Estrutura do Projeto
 
-### Tarefas:
-1. Acessar o site:  
-   [https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos](https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos)  
-2. Fazer o download dos Anexos I e II em formato PDF.  
-3. Compactar todos os anexos em um único arquivo (ZIP, RAR, etc.).  
+```
+DESAFIO-CARE-INTUITIVE/
+├── scripts/
+│   ├── web-scraping.py         # Coleta de dados
+│   └── data-transformacao.py   # Processamento de dados
+├── venv/                       # Ambiente virtual Python
+├── Makefile                    # Automação de tarefas
+├── requirements.txt            # Dependências do projeto
+└── README.md                   # Documentação
+```
 
----
+## Funcionamento dos Scripts
 
-## **2. Teste de Transformação de Dados**
-**Objetivo:** Extrair dados de um PDF, salvá-los em formato CSV e realizar transformações.  
-**Linguagens:** Python ou Java.  
+### 1. Web Scraping (`web-scraping.py`)
 
-### Tarefas:
-1. Extrair os dados da tabela "Rol de Procedimentos e Eventos em Saúde" do Anexo I (todas as páginas).  
-2. Salvar os dados em uma tabela estruturada no formato CSV.  
-3. Compactar o CSV em um arquivo denominado `Teste_(seu_nome).zip`.  
-4. Substituir as abreviações das colunas OD e AMB pelas descrições completas (conforme legenda no rodapé).  
+**Objetivo**: Coletar automaticamente os arquivos PDF da ANS.
 
----
+**Fluxo de execução**:
+1. Acessa o portal da ANS
+2. Identifica os links dos Anexos I e II
+3. Faz download dos arquivos PDF
+4. Compacta os arquivos em um ZIP único
 
-## **3. Teste de Banco de Dados**
-**Objetivo:** Criar scripts SQL para estruturar e analisar dados de operadoras de saúde.  
-**Bancos de Dados:** MySQL 8 ou PostgreSQL >10.0.  
+**Como executar**:
+```bash
+make webscraping
+```
 
-### Tarefas de Preparação:
-1. Baixar os arquivos dos últimos 2 anos do repositório público:  
-   [https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/](https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/)  
-2. Baixar os dados cadastrais das operadoras ativas em CSV:  
-   [https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/](https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/)  
+**Saída esperada**:
+- Arquivos PDF baixados na pasta raiz
+- Arquivo `Anexos_ANS.zip` contendo os PDFs
 
-### Tarefas de Código:
-1. Criar queries para estruturar tabelas necessárias para o arquivo CSV.  
-2. Elaborar queries para importar o conteúdo dos arquivos, considerando o encoding correto.  
-3. Desenvolver queries analíticas para responder:  
-   - Quais são as 10 operadoras com maiores despesas em "EVENTOS/ SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR" no último trimestre?  
-   - Quais são as 10 operadoras com maiores despesas nessa categoria no último ano?  
+### 2. Transformação de Dados (`data-transformacao.py`)
 
----
+**Objetivo**: Processar os arquivos coletados e gerar saídas estruturadas.
 
-## **4. Teste de API**
-**Objetivo:** Desenvolver uma interface web com Vue.js e um servidor em Python para busca textual.  
+**Fluxo de execução**:
+1. Lê o arquivo PDF do Anexo I
+2. Extrai as tabelas de procedimentos
+3. Transforma os dados em formato estruturado (CSV)
+4. Substitui abreviações pelos valores completos
+5. Gera arquivo compactado com os resultados
 
-### Tarefas de Preparação:
-1. Utilizar o CSV do item 3.2 (dados cadastrais das operadoras ativas).  
+**Como executar**:
+```bash
+make transformacao
+```
 
-### Tarefas de Código:
-1. Criar um servidor com uma rota que realize uma busca textual na lista de cadastros de operadoras e retorne os registros mais relevantes.  
-2. Elaborar uma coleção no Postman para demonstrar o resultado.  
+**Saída esperada**:
+- Arquivo `Rol_Procedimentos.csv` com os dados estruturados
+- Arquivo `Teste_[Nome].zip` contendo o CSV
 
----
+## Makefile - Automação de Tarefas
 
-## **Instruções Gerais**
-- Para cada teste, siga as especificações de linguagem e formato de saída.  
-- Certifique-se de que os arquivos gerados estejam corretamente nomeados e compactados.  
-- No caso do Teste de Banco de Dados, atente-se ao encoding dos arquivos durante a importação.  
-- Para o Teste de API, utilize Vue.js para o frontend e Python para o backend.  
+O Makefile fornece atalhos para todas as operações:
 
-**Boa sorte!** 🚀
+| Comando          | Função                                                                 |
+|------------------|-----------------------------------------------------------------------|
+| `make install`   | Cria ambiente virtual e instala dependências                          |
+| `make webscraping` | Executa apenas o script de web scraping                              |
+| `make transformacao` | Executa apenas o script de transformação de dados                   |
+| `make clean`     | Remove arquivos temporários, downloads e o ambiente virtual          |
+
+**Fluxo completo recomendado**:
+```bash
+make install       # Primeira vez
+make webscraping   # Coletar dados
+make transformacao # Processar dados
+```
+
+## Configuração do Ambiente
+
+1. Clone o repositório:
+```bash
+git clone [URL_DO_REPOSITÓRIO]
+cd DESAFIO-CARE-INTUITIVE
+```
+
+2. Configure o ambiente:
+```bash
+make install
+```
+
+3. Ative o ambiente virtual (quando necessário):
+```bash
+source venv/bin/activate
+```
+
+## Dependências
+
+Todas as dependências estão listadas em `requirements.txt` e incluem:
+- requests (para downloads)
+- beautifulsoup4 (para parsing HTML)
+- pandas (para manipulação de dados)
+- pdfplumber (para extração de PDFs)
+
+## Limpeza
+
+Para remover todos os arquivos gerados e o ambiente virtual:
+```bash
+make clean
+```
+
+## Observações Importantes
+
+1. Verifique se os arquivos PDF estão presentes antes de executar a transformação
+2. O script de transformação espera o arquivo exato "Anexo_I_Rol_*.pdf"
+3. Para problemas de encoding, verifique o arquivo PDF original
