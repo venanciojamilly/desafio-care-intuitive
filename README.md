@@ -1,4 +1,4 @@
-# README - Sistema de Processamento de Dados ANS
+# Sistema de Processamento de Dados ANS - Desafio Care intuitive
 
 ## Visão Geral
 
@@ -113,4 +113,3 @@ make clean
 
 1. Verifique se os arquivos PDF estão presentes antes de executar a transformação
 2. O script de transformação espera o arquivo exato "Anexo_I_Rol_*.pdf"
-3. Para problemas de encoding, verifique o arquivo PDF original
