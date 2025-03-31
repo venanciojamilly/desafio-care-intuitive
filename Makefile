@@ -1,47 +1,29 @@
-# Configurações
 VENV = venv
 PYTHON = $(VENV)/bin/python
-PIP = $(VENV)/bin/pip
-MAIN_SCRIPT = src/main.py
+SCRIPTS = scripts/
 
-.PHONY: help venv install run clean
+.PHONY: help install clean webscraping transformacao
 
 help:
 	@echo "Comandos disponíveis:"
-	@echo "  make venv      - Cria o ambiente virtual"
-	@echo "  make install   - Instala as dependências"
-	@echo "  make run       - Executa o script principal"
-	@echo "  make clean     - Remove o ambiente virtual"
-	@echo "  make all       - Configura tudo (venv + instalação)"
-all: setup run
+	@echo "  make install       - Instala dependências"
+	@echo "  make webscraping   - Executa web scraping"
+	@echo "  make transformacao - Processa dados"
+	@echo "  make clean         - Limpa ambiente"
 
-setup:
-	@echo "🛠️ Criando ambiente virtual..."
-	python3 -m venv $(VENV)
-	@echo "⚙️ Instalando dependências..."
-	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
-	@echo "✅ Configuração completa!"
-
-# Apenas instala dependências
 install:
-	@echo "📦 Instalando/atualizando dependências..."
-	$(PIP) install -r requirements.txt
+	python3 -m venv $(VENV)
+	$(VENV)/bin/pip install -r requirements.txt
 
-# Executa o programa principal
-run:
-	@echo "🚀 Executando script principal..."
-	$(PYTHON) $(MAIN_SCRIPT)
+webscraping:
+	@echo "Executando web scraping..."
+	$(PYTHON) $(SCRIPTS)web-scraping.py
 
-# Limpeza
+transformacao:
+	@echo "Executando transformação de dados..."
+	$(PYTHON) $(SCRIPTS)data-transformacao.py
+
 clean:
-	@echo "🧹 Limpando ambiente..."
-	rm -rf __pycache__
-	rm -rf .pytest_cache
-	rm -f *.zip *.pdf
-	@echo "⚠️  Use 'make nuke' para remover o venv também"
-
-# Limpeza completa (incluindo venv)
-nuke: clean
-	@echo "💥 Removendo ambiente virtual..."
 	rm -rf $(VENV)
+	rm -f *.zip *.pdf *.csv *.xlsx
+	rm -rf __pycache__
